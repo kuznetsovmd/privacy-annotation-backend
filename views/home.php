@@ -1,7 +1,6 @@
 <?php 
     include_once __DIR__ . '/blocks/header.php';
     use Engine\Services\AuthService as Auth; 
-    use App\Models\User; 
 ?>
 
 

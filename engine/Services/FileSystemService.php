@@ -2,6 +2,8 @@
 
 namespace Engine\Services;
 
+use PharData;
+
 use Engine\Service;
 use ZipArchive;
 use Engine\Config;
@@ -102,6 +104,27 @@ class FileSystemService extends Service
             $zip->close();
         }
         if ($rm) return unlink($file_path);
+        return true;
+    }
+
+    /**
+     * Untars archive.
+     *
+     * @access protected
+     * @param string $file - Which file
+     * @param string $path - Where to
+     * @return bool
+     */
+    protected function untar(string $file, string $path, bool $rm = false)
+    {
+        $file_path = $this->resolve($file);
+        $phar = new PharData($file_path);
+        $phar->decompress();
+        $tarPath = preg_replace('/\.gz$/', '', $file_path);
+        $tar = new PharData($tarPath);
+        $tar->extractTo($this->resolve($path));
+
+        if ($rm) return unlink($tarPath);
         return true;
     }
 

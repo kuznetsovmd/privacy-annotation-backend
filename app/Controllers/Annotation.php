@@ -9,7 +9,6 @@ use Engine\Services\SessionService as Session;
 use Engine\Services\AuthService as Auth;
 use Engine\Request;
 use Engine\View;
-use Engine\Services\DebugService as Debug;
 
 /**
  * Annotation.php
@@ -26,14 +25,14 @@ class Annotation
      */
     public static function toAnnotationPage(Request $request)
     {   
-        $hash = Session::get('policy_hash');
+        $hash = Session::get('hash');
 
         $policy = null;
         if (isset($hash)) {
             $policy = Policy::getExact($hash);
         } else {
             $policy = Policy::getRandom();
-            if (!empty($policy)) Session::set('policy_hash', $policy['hash']);
+            if (!empty($policy)) Session::set('hash', $policy['hash']);
         }
 
         $request->view = new View('annotation.php', [
@@ -53,10 +52,10 @@ class Annotation
         Redirection::redirect('/home');
 
         $id = Auth::authenticated();
-        $hash = Session::get('policy_hash');
+        $hash = Session::get('hash');
         $policy = Policy::getExact($hash)['content'];
 
-        Session::set('policy_hash', null);
+        Session::set('hash', null);
 
         $request->post_response = function () use ($request, $id, $hash, $policy) {
             $annotations = json_decode($request->parameters['json']);
@@ -75,7 +74,7 @@ class Annotation
                         $annotation->selection->ec - $annotation->selection->sc
                     ),
                     'user_id'           => $id,
-                    'policy_hash'       => $hash,
+                    'hash'              => $hash,
                 ];
 
                 if ($portion-- < 1) {

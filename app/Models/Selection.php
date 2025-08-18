@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Engine\Services\RawSQLService as SQL;
-use PDO;
 
 /**
  * Selection.php
@@ -29,7 +28,7 @@ class Selection
             `selection_class`,
             `selection_content`,
             `user_id`,
-            `policy_hash`
+            `hash`
         ) VALUES
 
         SQL;
@@ -42,7 +41,7 @@ class Selection
             $values[]    = $content['selection_class'];
             $values[]    = $content['selection_content'];
             $values[]    = $content['user_id'];
-            $values[]    = $content['policy_hash'];
+            $values[]    = $content['hash'];
         }
 
         return null !== SQL::set($sql . implode(",", $instances), $values);
@@ -64,7 +63,7 @@ class Selection
             `selections`.`selection_class`,
             `selections`.`selection_content`,
             `selections`.`user_id`,
-            `selections`.`policy_hash`,
+            `selections`.`hash`,
             `selections`.`created_at`,
             `users`.`name`,
             `users`.`email`

@@ -4,8 +4,6 @@ namespace App\Controllers;
 
 use App\Models\Selection;
 use App\Models\Policy;
-use Engine\Config;
-use Engine\Services\DebugService as Debug;
 use Engine\Services\AuthService as Auth;
 use Engine\Services\FileSystemService as FS;
 use Engine\Request;
@@ -43,36 +41,45 @@ class ManageData
         Redirection::redirect('/home');
 
         $request->post_response = function () use ($request) {
-
-            $descriptor = $request->parameters['descriptor'];
-            $documents = $request->parameters['documents'];
-            $key = $request->parameters['key'];
+            $descriptor = 'descriptor.jsonl';
+            $documents = 'markdown';
+            $key = 'hash';
             $tmp_file = $request->parameters['files']['data']['tmp_name'];
             $hash = md5(md5(rand()));
 
-            $archive = "$hash.zip";
+            $archive = "$hash.tar.gz";
             FS::resource($tmp_file, $archive);
-            FS::unzip($archive, $hash);
+            FS::untar($archive, $hash);
 
-            $json = json_decode(FS::read("$hash/$descriptor"), true);
-
+            $descriptor_file = FS::resolve("$hash/$descriptor");
             $portion = 100;
             $policies = [];
-            foreach ($json as $row => $value) {
-                $content = FS::read("$hash/$documents/{$value[$key]}");
-                $policies[$value['policy_hash']] = str_replace("\r", '', $content);
 
-                if ($portion-- < 1) {
-                    Policy::create($policies);
-                    $portion = 100;
-                    $policies = [];
+            $handle = fopen($descriptor_file, 'r');
+            if ($handle) {
+                while (($line = fgets($handle)) !== false) {
+                    $row = json_decode($line, true);
+                    if (!$row) continue;
+
+                    $content = FS::read("$hash/$documents/{$row[$key]}.md");
+                    $policies[$row[$key]] = str_replace("\r", '', $content);
+
+                    if (--$portion < 1) {
+                        Policy::create($policies);
+                        $portion = 100;
+                        $policies = [];
+                    }
                 }
+                fclose($handle);
             }
-            Policy::create($policies);
+
+            if (!empty($policies)) {
+                Policy::create($policies);
+            }
+
             FS::rmdir($hash, true);
 
         };
-
     }
 
     /**
@@ -83,8 +90,16 @@ class ManageData
     public static function download(Request $request)
     {
         $hash = md5(rand());
-        $file = "$hash.json";
-        FS::write($file, json_encode(Selection::packWithUsers()));
+        $file = "$hash.jsonl";
+
+        $data = Selection::packWithUsers();
+
+        $lines = [];
+        foreach ($data as $item) {
+            $lines[] = json_encode($item, JSON_UNESCAPED_UNICODE);
+        }
+
+        FS::write($file, implode("\n", $lines));
         FS::download($file, true);
     }
 

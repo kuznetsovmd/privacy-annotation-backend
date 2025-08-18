@@ -5,7 +5,6 @@ namespace App\Controllers;
 use Engine\Services\AuthService as Auth;
 use Engine\Request;
 use Engine\View;
-use App\Models\User;
 
 /**
  * Home.php

@@ -15,20 +15,8 @@
                 <form enctype="multipart/form-data" action="/data-upload" method="post">
                     <input name="csrf_token" value="<?php echo CSRF::generate() ?>" hidden>
                     <div class="form-group text-left">
-                        <label for="descriptorFile" class="form-label">Descriptor file in zip-archive</label>
-                        <input id="descriptorFile" name="descriptor" type="input" class="form-control" required="">
-                    </div>
-                    <div class="form-group text-left">
-                        <label for="documentsPath" class="form-label">Subfolder with documents within zip-archive</label>
-                        <input id="documentsPath" name="documents" type="input" class="form-control" required="">
-                    </div>
-                    <div class="form-group text-left">
-                        <label for="fileKey" class="form-label">Descriptor key for file (with extension) identification</label>
-                        <input id="fileKey" name="key" type="input" class="form-control" required="">
-                    </div>
-                    <div class="form-group text-left">
-                        <label for="inputData" class="form-label">Zip-archive with data</label>
-                        <input id="inputData" name="data" type="file" class="form-control" required="" accept=“zip/*”>
+                        <label for="inputData" class="form-label">tar.gz-archive with data</label>
+                        <input id="inputData" name="data" type="file" class="form-control" required="" accept=“.tar.gz”>
                     </div>
                     <div class="form-group text-left">
                         <input class="btn btn-lg btn-primary btn-block" type="submit" value="Upload">

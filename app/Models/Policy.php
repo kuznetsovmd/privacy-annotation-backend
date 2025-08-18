@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Engine\Services\RawSQLService as SQL;
-use PDO;
 
 /**
  * Policy.php
@@ -23,7 +22,7 @@ class Policy
     {
         $sql = <<<SQL
 
-        INSERT INTO `policies` (
+        INSERT IGNORE INTO `policies` (
             `hash`,
             `content`
         ) VALUES

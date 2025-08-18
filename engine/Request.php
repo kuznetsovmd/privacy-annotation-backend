@@ -3,7 +3,6 @@
 namespace Engine;
 
 use Engine\Routing\Route;
-use Engine\Request;
 use Closure;
 
 /**
